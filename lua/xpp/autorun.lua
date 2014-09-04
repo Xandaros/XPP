@@ -1,5 +1,7 @@
 -- Main table
-XPP = {}
+XPP = {
+	players = {}
+}
 
 -- Network strings
 util.AddNetworkString("xandaros_prop_protection_changefriend")
@@ -8,5 +10,10 @@ util.AddNetworkString("xandaros_prop_protection_changefriend")
 net.Receive("xandaros_prop_protection_changefriend", function(len, ply)
 	local uid = net.ReadUInt(32)
 	local value = net.ReadBit() ~= 0
-	print(uid .. " " .. tostring(value))
+	if not players[ply] then players[ply] = Player() end
+	if value then
+		players[ply]:addFriend(uid)
+	else
+		players[ply]:removeFriend(uid)
+	end
 end)
