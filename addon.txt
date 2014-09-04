@@ -1,0 +1,9 @@
+"AddonInfo"
+{
+	"name"        "Xandaros' Prop Protection"
+	"version"     "Git"
+	"author_name" "Xandaros"
+	"author_url"  ""
+	"info"        "Prop protection"
+	"override"    "0"
+}
