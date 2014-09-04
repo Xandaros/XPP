@@ -1,17 +1,18 @@
-Player = Class("Player")
+XPPPlayer = Class("XPPPlayer")
 
-function Player:constructor()
+function XPPPlayer:constructor(uid)
 	self.friends = {}
+	self.uid = uid
 end
 
-function Player:addFriend(uid)
+function XPPPlayer:addFriend(uid)
 	self.friends[uid] = true
 end
 
-function Player:removeFriend(uid)
+function XPPPlayer:removeFriend(uid)
 	self.friends[uid] = nil
 end
 
-function Player:isFriend(uid)
+function XPPPlayer:isFriend(uid)
 	return self.friends[uid] ~= nil
 end
