@@ -49,13 +49,11 @@ end
 -- Actual protection
 hook.Add("PhysgunPickup", "xandaros_prop_protection", function(ply, ent)
 	local prop = XPP.props[ent]
-	if not prop then print("Not prop") return false end
+	if not prop then return false end
 
 	local owner = prop:getOwner()
 	local uid = ply:UniqueID()
-	if uid == owner then print("owner") return end
-	print(uid)
-	print(owner)
+	if uid == owner then return end
 	local player = XPP.players[ply]
 	if player and player:isFriend(uid) then return true end
 	return false
