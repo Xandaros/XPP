@@ -8,7 +8,7 @@ function generateClientPanel(panel)
 			local cb = panel:CheckBox(v:GetName())
 			function cb:OnChange(value)
 				net.Start("xandaros_prop_protection_changefriend")
-					net.WriteUInt(v:UniqueID(), 32)
+					net.WriteString(v:SteamID())
 					net.WriteBit(value)
 				net.SendToServer()
 			end

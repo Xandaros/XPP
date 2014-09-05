@@ -6,6 +6,7 @@ include('prop.lua')
 -- Main table
 XPP = {
 	players = {},
+	steamIDToPlayer = {},
 	props = {}
 }
 
@@ -14,13 +15,14 @@ util.AddNetworkString("xandaros_prop_protection_changefriend")
 
 -- Net messages
 net.Receive("xandaros_prop_protection_changefriend", function(len, ply)
-	local uid = net.ReadUInt(32)
+	local steamid = net.ReadString()
 	local value = net.ReadBit() ~= 0
-	if not players[ply] then players[ply] = XPPPlayer() end
+	local players = XPP.players
+	print(steamid, tostring(value))
 	if value then
-		players[ply]:addFriend(uid)
+		players[ply]:addFriend(steamid)
 	else
-		players[ply]:removeFriend(uid)
+		players[ply]:removeFriend(steamid)
 	end
 end)
 
@@ -29,7 +31,7 @@ do
 	local cleanupAdd = cleanup.Add
 	function cleanup.Add(ply, typ, ent)
 		if not XPP.props[ent] and IsValid(ent) then
-			local prop = Prop(ent:EntIndex(), ply:UniqueID())
+			local prop = Prop(ent:EntIndex(), ply:SteamID())
 			XPP.props[ent] = prop
 		end
 		cleanupAdd(ply, typ, ent)
@@ -39,7 +41,7 @@ do
 	local addCount = plymeta.AddCount
 	function plymeta:AddCount(enttype, ent)
 		if not XPP.props[ent] and IsValid(ent) then
-			local prop = Prop(ent:EntIndex(), self:UniqueID())
+			local prop = Prop(ent:EntIndex(), self:SteamID())
 			XPP.props[ent] = prop
 		end
 		addCount(self, enttype, ent)
@@ -52,13 +54,17 @@ hook.Add("PhysgunPickup", "xandaros_prop_protection", function(ply, ent)
 	if not prop then return false end
 
 	local owner = prop:getOwner()
-	local uid = ply:UniqueID()
-	if uid == owner then return end
+	local steamid = ply:SteamID()
+	if steamid == owner then return end
+	if not owner then return false end
+	local ownerply = XPP.players[XPP.steamIDToPlayer[owner]]
+
 	local player = XPP.players[ply]
-	if player and player:isFriend(uid) then return true end
+	if player and ownerply:isFriend(ply:SteamID()) then return end
 	return false
 end)
 
-hook.Add("PlayerInitialSpawn", "xandaros_prop_protection", function(ply)
-	XPP.players[ply] = XPPPlayer(ply:UniqueID())
+hook.Add("PlayerAuthed", "xandaros_prop_protection", function(ply, steamid, uid)
+	XPP.players[ply] = XPPPlayer(steamid, ply)
+	XPP.steamIDToPlayer[steamid] = ply
 end)
